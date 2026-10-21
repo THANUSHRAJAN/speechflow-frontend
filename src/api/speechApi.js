@@ -57,12 +57,16 @@ export function openTranscriptionSocket({ language, onMessage, onClose }) {
      // if (!ready) fail(notRunning);
       //else onClose?.(event);
     //};
+
+
     ws.onclose = (event) => {
   console.error("[SpeechFlow] WebSocket closed:", {
     code: event.code,
     reason: event.reason,
     wasClean: event.wasClean,
     ready,
+    time: new Date().toISOString(),
+    bufferedAmount: ws?.bufferedAmount,
   });
 
   if (!ready) {
@@ -71,6 +75,10 @@ export function openTranscriptionSocket({ language, onMessage, onClose }) {
     onClose?.(event);
   }
 };
+    
+
+
+
     ws.onmessage = (event) => {
       let message;
       try {
