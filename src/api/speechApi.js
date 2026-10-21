@@ -45,11 +45,32 @@ export function openTranscriptionSocket({ language, onMessage, onClose }) {
     ws.binaryType = 'arraybuffer';
 
     ws.onopen = () => ws.send(JSON.stringify({ type: 'config', language }));
-    ws.onerror = () => { if (!ready) fail(notRunning); };
-    ws.onclose = (event) => {
-      if (!ready) fail(notRunning);
-      else onClose?.(event);
+    //ws.onerror = () => { if (!ready) fail(notRunning); };
+    ws.onerror = (event) => {
+  console.error("[SpeechFlow] WebSocket error:", event);
+
+    if (!ready) {
+    fail(notRunning);
+      }
     };
+    //ws.onclose = (event) => {
+     // if (!ready) fail(notRunning);
+      //else onClose?.(event);
+    //};
+    ws.onclose = (event) => {
+  console.error("[SpeechFlow] WebSocket closed:", {
+    code: event.code,
+    reason: event.reason,
+    wasClean: event.wasClean,
+    ready,
+  });
+
+  if (!ready) {
+    fail(notRunning);
+  } else {
+    onClose?.(event);
+  }
+};
     ws.onmessage = (event) => {
       let message;
       try {
